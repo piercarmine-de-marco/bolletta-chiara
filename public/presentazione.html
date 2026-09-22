@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BollettaChiara — Demo Deck</title>
+<style>
+  :root {
+    --ink: #0A0014;
+    --purple: #A100FF;
+    --purple-deep: #7500C0;
+    --purple-dark: #460073;
+    --purple-light: #BE82FF;
+    --purple-soft: #DCAFFF;
+    --magenta: #FF50A0;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--ink); color: #fff; font-family: system-ui, -apple-system, sans-serif; }
+  body { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; padding: 20px 24px 16px; gap: 12px; overflow: hidden; }
+
+  #toolbar { display: flex; align-items: center; gap: 12px; }
+  #progress-bar { flex: 1; height: 3px; background: rgba(255,255,255,0.07); border-radius: 99px; overflow: hidden; }
+  #progress-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--purple-light), var(--magenta)); transition: width 0.4s ease; border-radius: 99px; }
+  #counter { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.45); white-space: nowrap; }
+  #counter span { color: #fff; }
+
+  #deck { position: relative; min-height: 0; }
+  .slide { display: none; height: 100%; }
+  .slide.active { display: block; }
+  .slide-stage { height: 100%; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); background: rgba(10,0,20,0.5); overflow: hidden; }
+  .slide-content { height: 100%; padding: 44px 56px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+
+  #nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  #dots { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
+  .dot-btn { width: 6px; height: 6px; border-radius: 99px; border: none; background: rgba(255,255,255,0.2); cursor: pointer; transition: width .3s, background .3s; padding: 0; }
+  .dot-btn.active { width: 24px; background: var(--purple); }
+  .btn-prev { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.15); background: transparent; border-radius: 99px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); cursor: pointer; transition: border-color .2s, color .2s; }
+  .btn-prev:hover:not(:disabled) { border-color: rgba(255,255,255,0.3); color: #fff; }
+  .btn-prev:disabled { opacity: .3; cursor: not-allowed; }
+  .btn-next { display: inline-flex; align-items: center; gap: 8px; border: none; background: var(--purple); border-radius: 99px; padding: 10px 24px; font-size: 13px; font-weight: 700; color: #fff; cursor: pointer; transition: transform .2s; box-shadow: 0 0 40px -8px rgba(161,0,255,0.6); }
+  .btn-next:hover:not(:disabled) { transform: scale(1.03); }
+  .btn-next:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); box-shadow: none; cursor: not-allowed; }
+
+  .slide-header { margin-bottom: 28px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: var(--purple-light); }
+  .slide-header h2 { margin-top: 8px; font-size: clamp(24px, 3.2vw, 38px); font-weight: 700; line-height: 1.15; }
+  .subtitle { margin-top: 10px; font-size: 15px; color: rgba(255,255,255,0.6); max-width: 700px; }
+
+  .cover-center { text-align: center; }
+  .cover-badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); border-radius: 99px; padding: 6px 16px; font-size: 11px; font-weight: 600; letter-spacing: .25em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+  .dot-mark { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); display: inline-block; }
+  .cover-title { font-size: clamp(38px, 6vw, 68px); font-weight: 700; line-height: 1.02; margin: 22px auto 0; }
+  .closing-title { font-size: clamp(24px, 3.8vw, 44px); font-weight: 700; line-height: 1.15; margin: 20px auto 0; max-width: 800px; }
+  .cover-subtitle { font-size: 16px; color: rgba(255,255,255,0.65); max-width: 520px; margin: 14px auto 0; }
+  .text-gradient { background: linear-gradient(135deg, var(--purple-light), var(--purple), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 26px; }
+  .chip { border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); border-radius: 99px; padding: 6px 16px; font-size: 13px; color: rgba(255,255,255,0.75); }
+  .chip-purple { border-color: rgba(161,0,255,0.4); background: rgba(161,0,255,0.1); font-weight: 600; color: rgba(255,255,255,0.9); }
+
+  .bullets { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .bullets li { display: flex; align-items: flex-start; gap: 16px; }
+  .bullet-num { flex-shrink: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(161,0,255,0.15); font-size: 13px; font-weight: 700; color: var(--purple-light); margin-top: 2px; }
+  .bullets span:last-child { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.85); }
+
+  .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card { border-radius: 12px; border: 1px solid rgba(161,0,255,0.2); background: rgba(10,0,20,0.7); padding: 18px; }
+  .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 7px; }
+  .card p { font-size: 13px; line-height: 1.6; color: rgba(255,255,255,0.65); }
+  .card-icon { font-size: 22px; margin-bottom: 10px; }
+
+  .steps { display: flex; flex-direction: column; gap: 18px; }
+  .step { display: flex; align-items: flex-start; gap: 20px; }
+  .step-num { font-size: 26px; font-weight: 700; color: rgba(161,0,255,0.55); font-variant-numeric: tabular-nums; line-height: 1; flex-shrink: 0; width: 36px; }
+  .step-body { flex: 1; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px; }
+  .step-body h3 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .step-body p { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.65); }
+
+  .highlight-box { border-radius: 14px; border: 1px solid rgba(161,0,255,0.3); background: rgba(161,0,255,0.07); padding: 24px 28px; margin-bottom: 20px; }
+  .highlight-box .label { font-size: 11px; font-weight: 700; letter-spacing: .25em; text-transform: uppercase; color: var(--purple-light); margin-bottom: 8px; }
+  .highlight-box p { font-size: 16px; line-height: 1.65; color: rgba(255,255,255,0.85); }
+
+  .feature-row { display: flex; gap: 14px; margin-top: 16px; }
+  .feature-item { flex: 1; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); padding: 16px; text-align: center; }
+  .feature-item .fi-icon { font-size: 28px; margin-bottom: 8px; }
+  .feature-item .fi-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .feature-item .fi-desc { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; line-height: 1.5; }
+
+  .flow-steps { display: flex; flex-direction: column; gap: 12px; }
+  .flow-step { display: flex; align-items: center; gap: 16px; border-radius: 10px; padding: 14px 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+  .flow-step.active-step { border-color: rgba(161,0,255,0.4); background: rgba(161,0,255,0.08); }
+  .flow-step-icon { font-size: 22px; flex-shrink: 0; width: 40px; text-align: center; }
+  .flow-step-body h4 { font-size: 15px; font-weight: 600; }
+  .flow-step-body p { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+  .flow-badge { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--purple-light); background: rgba(161,0,255,0.15); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <div id="counter"><span id="cur">01</span> / <span id="tot">8</span></div>
+</div>
+
+<div id="deck">
+
+  <!-- SLIDE 1 — Cover -->
+  <div class="slide active" data-index="0">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="cover-center">
+          <span class="cover-badge"><span class="dot-mark"></span>Hackathon · Demo</span>
+          <h2 class="cover-title"><span class="text-gradient">BollettaChiara</span></h2>
+          <p class="cover-subtitle">Un copilota che legge la bolletta e compila il reclamo al posto tuo — in 2 minuti.</p>
+          <div class="chips">
+            <span class="chip">Accessibilità digitale</span>
+            <span class="chip">Intelligenza artificiale</span>
+            <span class="chip">Zero competenze richieste</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 — Il problema -->
+  <div class="slide" data-index="1">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">Il problema</span>
+          <h2>Fare un reclamo sulla bolletta è più difficile del necessario</h2>
+          <p class="subtitle">Anche per chi è abituato a usare servizi digitali.</p>
+        </div>
+        <ul class="bullets">
+          <li><span class="bullet-num">1</span><span>Il modulo chiede dati tecnici che non si trovano facilmente: codice POD, codice cliente, periodo esatto…</span></li>
+          <li><span class="bullet-num">2</span><span>Le informazioni sono sparse su pagine diverse della bolletta, scritte in piccolo.</span></li>
+          <li><span class="bullet-num">3</span><span>Senza sapere quali dati inserire, il reclamo non parte — e si rinuncia.</span></li>
+          <li><span class="bullet-num">4</span><span>Il call center è l'unica alternativa, con attese di 40+ minuti.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 — La soluzione -->
+  <div class="slide" data-index="2">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">La soluzione</span>
+          <h2>BollettaChiara guida passo dopo passo</h2>
+          <p class="subtitle">L'utente carica la bolletta. L'app fa tutto il resto — in 4 fasi.</p>
+        </div>
+        <div class="feature-row">
+          <div class="feature-item">
+            <div class="fi-icon">📄</div>
+            <div class="fi-label">Fase 1</div>
+            <div class="fi-desc">Carica il PDF</div>
+          </div>
+          <div class="feature-item">
+            <div class="fi-icon">🔍</div>
+            <div class="fi-label">Fase 2</div>
+            <div class="fi-desc">Riepilogo chiaro</div>
+          </div>
+          <div class="feature-item">
+            <div class="fi-icon">✍️</div>
+            <div class="fi-label">Fase 3</div>
+            <div class="fi-desc">Form autocompilato</div>
+          </div>
+          <div class="feature-item">
+            <div class="fi-icon">📧</div>
+            <div class="fi-label">Fase 4</div>
+            <div class="fi-desc">Email pronta</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 — Fase 1: Carica -->
+  <div class="slide" data-index="3">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">Fase 1</span>
+          <h2>Carica la bolletta</h2>
+          <p class="subtitle">Un'unica azione. L'app si occupa di leggere tutto.</p>
+        </div>
+        <div class="highlight-box">
+          <div class="label">Cosa vede l'utente</div>
+          <p>Una schermata semplice con un'area di caricamento. Trascina il PDF oppure clicca per selezionarlo. Niente moduli, niente istruzioni complicate.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon">🤖</div>
+            <h3>L'app legge per te</h3>
+            <p>L'intelligenza artificiale analizza il documento e individua in automatico tutti i dati presenti nella bolletta.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <h3>In pochi secondi</h3>
+            <p>Il tempo di elaborazione è di qualche secondo. L'utente vede un messaggio chiaro mentre l'app lavora.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 — Fase 2: Riepilogo -->
+  <div class="slide" data-index="4">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">Fase 2</span>
+          <h2>Riepilogo in linguaggio chiaro</h2>
+          <p class="subtitle">Nessun termine tecnico. Solo le informazioni che contano.</p>
+        </div>
+        <div class="highlight-box">
+          <div class="label">Cosa vede l'utente</div>
+          <p>I dati essenziali della bolletta — tipo di fornitura, intestatario, periodo e importo — mostrati in modo neutro e leggibile. Zero interpretazioni, zero giudizi.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon">🏷️</div>
+            <h3>Tipologia bolletta</h3>
+            <p>L'app riconosce automaticamente se si tratta di luce, gas o entrambi — e lo mostra con un'icona.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">▶️</div>
+            <h3>Una scelta sola</h3>
+            <p>Dall'utente è richiesta una sola azione: confermare e procedere con il reclamo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 — Fase 3: Form autocompilato -->
+  <div class="slide" data-index="5">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">Fase 3 — Il momento wow</span>
+          <h2>Il form si compila da solo</h2>
+          <p class="subtitle">5 campi compilati automaticamente. L'utente non cerca nulla.</p>
+        </div>
+        <div class="flow-steps">
+          <div class="flow-step active-step">
+            <div class="flow-step-icon">✅</div>
+            <div class="flow-step-body"><h4>Nome e cognome</h4><p>Estratto dall'intestazione della bolletta</p></div>
+            <span class="flow-badge">Automatico</span>
+          </div>
+          <div class="flow-step active-step">
+            <div class="flow-step-icon">✅</div>
+            <div class="flow-step-body"><h4>Codice cliente · Codice POD</h4><p>Identificativi tecnici letti dalla bolletta</p></div>
+            <span class="flow-badge">Automatico</span>
+          </div>
+          <div class="flow-step active-step">
+            <div class="flow-step-icon">✅</div>
+            <div class="flow-step-body"><h4>Periodo contestato · Importo</h4><p>Dati di fatturazione inseriti senza ricerca manuale</p></div>
+            <span class="flow-badge">Automatico</span>
+          </div>
+          <div class="flow-step">
+            <div class="flow-step-icon">✍️</div>
+            <div class="flow-step-body"><h4>Motivo del reclamo</h4><p>L'unico campo che richiede una scelta dell'utente</p></div>
+            <span class="flow-badge" style="color:var(--magenta);background:rgba(255,80,160,0.1);border-color:rgba(255,80,160,0.3)">Guidato</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 — Fase 3b: Motivo guidato -->
+  <div class="slide" data-index="6">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">Fase 3 — Motivo del reclamo</span>
+          <h2>Tre opzioni pronte. Un click per scegliere.</h2>
+          <p class="subtitle">L'app propone i motivi più plausibili in base ai dati della bolletta. Non bisogna inventare nulla.</p>
+        </div>
+        <div class="highlight-box">
+          <div class="label">Come funziona</div>
+          <p>L'intelligenza artificiale legge i dati della bolletta e genera 3 opzioni concrete e pertinenti. L'utente clicca su quella che si avvicina di più alla sua situazione — oppure scrive a mano se preferisce.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon">🎯</div>
+            <h3>Opzioni su misura</h3>
+            <p>Non sono opzioni generiche: vengono generate in base all'importo, al periodo e al tipo di fornitura della bolletta specifica.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">✏️</div>
+            <h3>Sempre modificabile</h3>
+            <p>Il campo rimane editabile. Chi preferisce scrivere il motivo a parole proprie può farlo senza limitazioni.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8 — Fase 4: Email -->
+  <div class="slide" data-index="7">
+    <div class="slide-stage">
+      <div class="slide-content">
+        <div class="slide-header">
+          <span class="kicker">Fase 4</span>
+          <h2>La lettera di reclamo è già scritta</h2>
+          <p class="subtitle">Un click e si apre il client email con tutto già pronto.</p>
+        </div>
+        <div class="highlight-box">
+          <div class="label">Cosa succede</div>
+          <p>L'app genera una lettera formale di reclamo, compila automaticamente il destinatario con l'indirizzo email del fornitore e apre direttamente il programma di posta con oggetto e testo già inseriti. L'utente preme solo Invia.</p>
+        </div>
+        <div class="cards-grid">
+          <div class="card">
+            <div class="card-icon">📮</div>
+            <h3>Destinatario automatico</h3>
+            <p>L'indirizzo email del fornitore viene estratto dalla bolletta stessa. Non serve cercarlo.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📋</div>
+            <h3>Copia di riserva</h3>
+            <p>Se il programma email non si apre, il testo è sempre disponibile per copiarlo e incollarlo manualmente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div id="nav">
+  <button class="btn-prev" id="btn-prev" disabled>← Indietro</button>
+  <div id="dots"></div>
+  <button class="btn-next" id="btn-next">Avanti →</button>
+</div>
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var fill = document.getElementById('progress-fill');
+  var cur = document.getElementById('cur');
+  var btnPrev = document.getElementById('btn-prev');
+  var btnNext = document.getElementById('btn-next');
+  var dotsContainer = document.getElementById('dots');
+  var total = slides.length;
+  var idx = 0;
+
+  for (var i = 0; i < total; i++) {
+    var d = document.createElement('button');
+    d.className = 'dot-btn' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dotsContainer.appendChild(d);
+    d.addEventListener('click', (function(n){ return function(){ show(n); }; })(i));
+  }
+
+  function getDots() { return dotsContainer.querySelectorAll('.dot-btn'); }
+
+  function show(n) {
+    n = Math.max(0, Math.min(total - 1, n));
+    slides[idx].classList.remove('active');
+    getDots()[idx].classList.remove('active');
+    idx = n;
+    slides[idx].classList.add('active');
+    getDots()[idx].classList.add('active');
+    fill.style.width = ((idx + 1) / total * 100) + '%';
+    cur.textContent = String(idx + 1).padStart(2, '0');
+    btnPrev.disabled = idx === 0;
+    btnNext.disabled = idx === total - 1;
+  }
+
+  show(0);
+  btnPrev.addEventListener('click', function(){ show(idx - 1); });
+  btnNext.addEventListener('click', function(){ show(idx + 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); show(idx + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); show(idx - 1); }
+    else if (e.key === 'Home'){ e.preventDefault(); show(0); }
+    else if (e.key === 'End'){ e.preventDefault(); show(total - 1); }
+  });
+})();
+</script>
+</body>
+</html>
