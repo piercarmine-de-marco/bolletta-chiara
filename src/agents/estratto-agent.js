@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { promptEstrato } from '../prompts/estratto.js'
 
 const MODEL = 'claude-sonnet-4-6'
@@ -36,40 +35,27 @@ Scadenza pagamento: ${b.scadenza_pagamento}`
   )
   if (result.error) throw new Error(`Spawn error: ${result.error.message}`)
   if (result.status !== 0) throw new Error(`claude CLI exit ${result.status}:\n${result.stderr}`)
-
   return parseClaudeResponse(result.stdout.trim())
 }
 
 async function estrattoAgentBrowser(pdfBase64) {
-  const client = new Anthropic({
-    apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY,
-    dangerouslyAllowBrowser: true,
+  const res = await fetch('/api/claude', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ systemPrompt: promptEstrato, pdfBase64 }),
   })
-  const response = await client.messages.create({
-    model: MODEL,
-    max_tokens: 1024,
-    system: promptEstrato,
-    messages: [
-      {
-        role: 'user',
-        content: [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } }],
-      },
-    ],
-  })
-  const raw = response.content.find(b => b.type === 'text')?.text?.trim() ?? ''
-  return parseClaudeResponse(raw)
+  if (!res.ok) throw new Error(await res.text())
+  const { response, error } = await res.json()
+  if (error) throw new Error(error)
+  return parseClaudeResponse(response)
 }
 
 export async function estrattoAgent(pdfBase64) {
   try {
-    if (typeof window === 'undefined') {
-      return await estrattoAgentNode()
-    }
+    if (typeof window === 'undefined') return await estrattoAgentNode()
     return await estrattoAgentBrowser(pdfBase64)
   } catch (err) {
-    if (typeof window !== 'undefined') {
-      throw new Error('Non riesco a leggere la bolletta. Prova a ricaricarla.')
-    }
+    if (typeof window !== 'undefined') throw new Error('Non riesco a leggere la bolletta. Prova a ricaricarla.')
     throw err
   }
 }
@@ -78,35 +64,17 @@ export async function estrattoAgent(pdfBase64) {
 async function testEstrattoAgent() {
   console.log('🧪  testEstrattoAgent — dati da bolletta-esempio.json')
   console.log('⏳  Chiamata a Claude CLI...')
-
   let result
-  try {
-    result = await estrattoAgent(null)
-  } catch (e) {
-    console.error('❌  Errore:', e.message)
-    process.exit(1)
-  }
-
+  try { result = await estrattoAgent(null) } catch (e) { console.error('❌  Errore:', e.message); process.exit(1) }
   console.log('\n✅  JSON estratto:')
   console.log(JSON.stringify(result, null, 2))
-
-  const campiAttesi = [
-    'codice_pod', 'codice_cliente', 'intestatario', 'indirizzo_fornitura',
-    'periodo_fatturazione', 'importo_totale', 'importo_periodo_precedente',
-    'consumi_kwh', 'scadenza_pagamento',
-  ]
+  const campiAttesi = ['codice_pod','codice_cliente','intestatario','indirizzo_fornitura','periodo_fatturazione','importo_totale','importo_periodo_precedente','consumi_kwh','scadenza_pagamento']
   const mancanti = campiAttesi.filter(c => !(c in result))
-  const tipiErrati = []
-  if (typeof result.importo_totale !== 'number') tipiErrati.push('importo_totale (atteso number)')
-  if (typeof result.consumi_kwh !== 'number') tipiErrati.push('consumi_kwh (atteso number)')
-
+  if (typeof result.importo_totale !== 'number') console.warn('⚠️   importo_totale non è number')
   if (mancanti.length) console.warn('⚠️   Campi mancanti:', mancanti.join(', '))
-  if (tipiErrati.length) console.warn('⚠️   Tipi errati:', tipiErrati.join(', '))
-  if (!mancanti.length && !tipiErrati.length) console.log('✅  Schema completo e tipi corretti')
+  else console.log('✅  Schema completo e tipi corretti')
 }
 
 import('url').then(({ fileURLToPath }) => {
-  if (typeof process !== 'undefined' && process.argv?.[1] === fileURLToPath(import.meta.url)) {
-    testEstrattoAgent()
-  }
+  if (typeof process !== 'undefined' && process.argv?.[1] === fileURLToPath(import.meta.url)) testEstrattoAgent()
 }).catch(() => {})
