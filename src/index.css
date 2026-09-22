@@ -1,0 +1,379 @@
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --primary: #1a5276;
+  --primary-hover: #154360;
+  --accent: #f0f7ff;
+  --text: #111111;
+  --text-muted: #5d6d7e;
+  --success: #1e8449;
+  --error: #a93226;
+  --border: #aeb6bf;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  --radius: 8px;
+  --btn-h: 52px;
+  --f-base: 18px;
+  --f-lg: 22px;
+  --f-xl: 28px;
+  --f-xxl: 38px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-size: var(--f-base);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+
+.schermata {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.schermata-titolo {
+  font-size: var(--f-xl);
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.schermata-sottotitolo {
+  font-size: var(--f-base);
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--btn-h);
+  padding: 0 1.75rem;
+  border-radius: var(--radius);
+  font-size: var(--f-base);
+  font-weight: 600;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--accent); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--border);
+  font-weight: 400;
+}
+.btn-ghost:hover:not(:disabled) { background: #f0f0f0; }
+
+.btn-lg {
+  font-size: var(--f-lg);
+  height: 60px;
+  padding: 0 2.5rem;
+}
+
+.btn-full { width: 100%; }
+
+.azioni {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+/* ── Form fields ─────────────────────────────────────────── */
+
+.campo-gruppo {
+  margin-bottom: 1.25rem;
+}
+
+.campo-label {
+  display: block;
+  font-size: var(--f-base);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.campo-badge {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--accent);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.campo-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 0.75rem;
+  font-size: var(--f-base);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.campo-input:focus { border-color: var(--primary); }
+
+.campo-input--prefilled {
+  background: var(--accent);
+  color: var(--text);
+}
+
+.campo-input--vuoto {
+  background: var(--surface);
+}
+
+.campo-textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font-size: var(--f-base);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  resize: vertical;
+  min-height: 90px;
+  transition: border-color 0.15s;
+}
+.campo-textarea:focus { border-color: var(--primary); }
+
+/* ── Messaggi ────────────────────────────────────────────── */
+
+.messaggio-loading {
+  font-size: var(--f-base);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.messaggio-errore {
+  font-size: var(--f-base);
+  color: var(--error);
+  background: #fdf0ef;
+  border: 1px solid #f1948a;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+
+.messaggio-successo {
+  font-size: var(--f-base);
+  color: var(--success);
+  background: #eafaf1;
+  border: 1px solid #82e0aa;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+
+/* ── Upload area ─────────────────────────────────────────── */
+
+.upload-area {
+  border: 3px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  background: var(--surface);
+}
+
+.upload-area:hover, .upload-area--drag { border-color: var(--primary); background: var(--accent); }
+
+.upload-icona {
+  font-size: 48px;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.upload-testo-principale {
+  font-size: var(--f-lg);
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.upload-testo-secondario {
+  font-size: var(--f-base);
+  color: var(--text-muted);
+}
+
+/* ── Riepilogo bolletta ───────────────────────────────────── */
+
+.riepilogo-griglia {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .riepilogo-griglia { grid-template-columns: 1fr; }
+}
+
+.riepilogo-campo {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+}
+
+.riepilogo-campo-etichetta {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.riepilogo-campo-valore {
+  font-size: var(--f-lg);
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ── Form + Tool affiancati ──────────────────────────────── */
+
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 750px) {
+  .form-layout { grid-template-columns: 1fr; }
+}
+
+.tool-panel {
+  background: var(--accent);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.tool-panel-titolo {
+  font-size: var(--f-base);
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.opzione-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.6rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: var(--f-base);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1.4;
+  min-height: 52px;
+  color: var(--text);
+}
+
+.opzione-btn:hover { border-color: var(--primary); background: var(--accent); }
+.opzione-btn--selezionata { border-color: var(--success); background: #eafaf1; font-weight: 600; }
+
+.soccorso-risposta {
+  background: var(--surface);
+  border-left: 4px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.75rem 1rem;
+  font-size: var(--f-base);
+  color: var(--text);
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+/* ── Bozza reclamo ───────────────────────────────────────── */
+
+.bozza-testo {
+  width: 100%;
+  font-size: var(--f-base);
+  font-family: inherit;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  background: var(--surface);
+  color: var(--text);
+  resize: none;
+  line-height: 1.7;
+  min-height: 280px;
+}
+
+/* ── Header app ──────────────────────────────────────────── */
+
+.app-header {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.85rem 1.5rem;
+  font-size: var(--f-lg);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
