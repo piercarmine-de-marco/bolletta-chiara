@@ -1,0 +1,11 @@
+{
+  "codice_pod": "IT001E12345678",
+  "codice_cliente": "7890123",
+  "intestatario": "Maria Rossi",
+  "indirizzo_fornitura": "Via Roma 14, Milano",
+  "periodo_fatturazione": "01/03/2025 - 31/05/2025",
+  "importo_totale": 487.32,
+  "importo_periodo_precedente": 142.10,
+  "consumi_kwh": 1240,
+  "scadenza_pagamento": "15/07/2025"
+}

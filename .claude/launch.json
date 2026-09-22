@@ -1,0 +1,9 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bolletta-chiara",
+      "url": "http://localhost:5173"
+    }
+  ]
+}

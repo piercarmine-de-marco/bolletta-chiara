@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bolletta Energetica — LuceItalia S.p.A.</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 11px;
+      color: #1a1a1a;
+      background: #e8e8e8;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: #ffffff;
+      padding: 14mm 14mm 10mm 14mm;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 3px solid #003087;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+    }
+    .logo-name {
+      font-size: 26px;
+      font-weight: 900;
+      color: #003087;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+    .logo-name span { color: #f5a800; }
+    .logo-tagline {
+      font-size: 9px;
+      color: #555;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .doc-info {
+      text-align: right;
+      font-size: 9.5px;
+      color: #444;
+      line-height: 1.6;
+    }
+    .doc-info strong { color: #003087; font-size: 11px; }
+    .doc-number {
+      font-size: 13px;
+      font-weight: 700;
+      color: #003087;
+    }
+
+    /* ── Grid intestazione ── */
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    /* ── Box cliente ── */
+    .box {
+      border: 1px solid #d0d8e8;
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+    .box-title {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #003087;
+      margin-bottom: 6px;
+      border-bottom: 1px solid #d0d8e8;
+      padding-bottom: 4px;
+    }
+    .box table td {
+      padding: 1.5px 0;
+      vertical-align: top;
+    }
+    .box table td:first-child {
+      color: #666;
+      padding-right: 10px;
+      white-space: nowrap;
+      font-size: 9.5px;
+    }
+    .box table td:last-child {
+      font-weight: 600;
+      font-size: 10px;
+    }
+
+    /* ── Codici evidenziati ── */
+    .code-badge {
+      display: inline-block;
+      background: #eef3fb;
+      border: 1px solid #b0c4e8;
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #003087;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Box importo totale ── */
+    .box-importo {
+      border: 2px solid #003087;
+      border-radius: 6px;
+      padding: 12px 18px;
+      text-align: center;
+      background: #f5f8ff;
+      min-width: 160px;
+    }
+    .importo-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    .importo-value {
+      font-size: 36px;
+      font-weight: 900;
+      color: #003087;
+      line-height: 1;
+    }
+    .importo-value small {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .importo-scadenza {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #c0cfe8;
+      font-size: 9.5px;
+      color: #444;
+    }
+    .importo-scadenza strong {
+      display: block;
+      font-size: 12px;
+      color: #c0392b;
+      font-weight: 700;
+    }
+
+    /* ── Periodo ── */
+    .periodo-bar {
+      background: #003087;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+    }
+    .periodo-bar strong { font-size: 11px; }
+
+    /* ── Tabelle ── */
+    table.data {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 10px;
+    }
+    table.data thead th {
+      background: #003087;
+      color: #fff;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    table.data thead th:last-child { text-align: right; }
+    table.data tbody tr:nth-child(even) { background: #f7f9fd; }
+    table.data tbody td {
+      padding: 5px 8px;
+      border-bottom: 1px solid #e8ecf4;
+      vertical-align: middle;
+    }
+    table.data tbody td:last-child { text-align: right; font-weight: 600; }
+    table.data tfoot td {
+      padding: 6px 8px;
+      font-weight: 700;
+      border-top: 2px solid #003087;
+    }
+    table.data tfoot td:last-child {
+      text-align: right;
+      color: #003087;
+      font-size: 12px;
+    }
+
+    /* ── Sezione dettaglio voci ── */
+    .section-title {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #003087;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    /* ── Alert pagamento ── */
+    .payment-alert {
+      border: 2px solid #c0392b;
+      border-radius: 4px;
+      padding: 8px 12px;
+      background: #fdf2f2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .payment-alert .pa-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+    .payment-alert .pa-value { font-size: 14px; font-weight: 800; color: #c0392b; }
+    .payment-alert .pa-how { font-size: 9.5px; color: #444; text-align: right; line-height: 1.5; }
+
+    /* ── Info POD ── */
+    .pod-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .pod-box {
+      flex: 1;
+      border: 1px solid #d0d8e8;
+      border-radius: 4px;
+      padding: 8px 10px;
+      background: #f5f8ff;
+    }
+    .pod-box .pb-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 3px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid #d0d8e8;
+      padding-top: 8px;
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      color: #888;
+      font-size: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── Watermark pagina ── */
+    .page-num {
+      text-align: center;
+      font-size: 8px;
+      color: #bbb;
+      margin-top: 8px;
+    }
+
+    /* ── Nota ── */
+    .nota {
+      background: #fffbea;
+      border-left: 3px solid #f5a800;
+      padding: 6px 10px;
+      font-size: 9px;
+      color: #555;
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      body { background: none; }
+      .page {
+        margin: 0;
+        padding: 12mm 14mm 10mm 14mm;
+        box-shadow: none;
+        width: 100%;
+        min-height: auto;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-name">LUCE<span>Italia</span></div>
+      <div class="logo-tagline">Energia per tutti · Società per Azioni</div>
+      <div style="margin-top:4px;font-size:9px;color:#666;">
+        Via dell'Energia 1 · 20121 Milano<br>
+        P.IVA 03456789012 · Tel 800 123 456
+      </div>
+    </div>
+    <div class="doc-info">
+      <div class="doc-number">FATTURA N. 2025-03847</div>
+      <div>Data emissione: <strong>10/06/2025</strong></div>
+      <div>Tipologia: <strong>Bolletta bimestrale</strong></div>
+      <div>Mercato: <strong>Tutelato</strong></div>
+      <div style="margin-top:6px;padding:4px 8px;background:#eef3fb;border-radius:3px;border:1px solid #b0c4e8;">
+        Uso domestico residente
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOP GRID: cliente + importo ══ -->
+  <div class="top-grid">
+    <!-- Cliente -->
+    <div class="box">
+      <div class="box-title">Dati intestatario</div>
+      <table>
+        <tr>
+          <td>Intestatario</td>
+          <td>MARIA ROSSI</td>
+        </tr>
+        <tr>
+          <td>Indirizzo fornitura</td>
+          <td>Via Roma 14, 20100 Milano (MI)</td>
+        </tr>
+        <tr>
+          <td>Codice cliente</td>
+          <td><span class="code-badge">7890123</span></td>
+        </tr>
+        <tr>
+          <td>Codice POD</td>
+          <td><span class="code-badge">IT001E12345678</span></td>
+        </tr>
+        <tr>
+          <td>Contratto</td>
+          <td>CTR-2019-00441 · attivo dal 01/01/2020</td>
+        </tr>
+        <tr>
+          <td>Potenza disponibile</td>
+          <td>3,3 kW · Tensione 230V monofase</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Importo totale -->
+    <div class="box-importo">
+      <div class="importo-label">Totale da pagare</div>
+      <div class="importo-value"><small>€</small> 487<small>,32</small></div>
+      <div class="importo-scadenza">
+        Entro il
+        <strong>15/07/2025</strong>
+        <span style="font-size:8px;color:#666;">vedi modalità di pagamento</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PERIODO ══ -->
+  <div class="periodo-bar">
+    <span>Periodo di fatturazione: <strong>01/03/2025 – 31/05/2025</strong> &nbsp;(92 giorni)</span>
+    <span>Lettura: <strong>Effettiva</strong> · Contatore: <strong>EM-8814-22</strong></span>
+  </div>
+
+  <!-- ══ ALERT PAGAMENTO ══ -->
+  <div class="payment-alert">
+    <div>
+      <div class="pa-label">Scadenza pagamento</div>
+      <div class="pa-value">15 luglio 2025</div>
+    </div>
+    <div class="pa-how">
+      Pagabile tramite: domiciliazione bancaria · bollettino postale<br>
+      IBAN: IT60 X054 2811 1010 0000 0123 456 &nbsp;|&nbsp; Causale: FAT 2025-03847
+    </div>
+  </div>
+
+  <!-- ══ POD + CLIENTE ══ -->
+  <div class="pod-row">
+    <div class="pod-box">
+      <div class="pb-label">Codice POD (Point of Delivery)</div>
+      <span class="code-badge" style="font-size:12px;">IT001E12345678</span>
+      <div style="margin-top:4px;font-size:8.5px;color:#666;">Identificativo univoco del punto di fornitura</div>
+    </div>
+    <div class="pod-box">
+      <div class="pb-label">Codice cliente</div>
+      <span class="code-badge" style="font-size:12px;">7890123</span>
+      <div style="margin-top:4px;font-size:8.5px;color:#666;">Da indicare in ogni comunicazione</div>
+    </div>
+    <div class="pod-box">
+      <div class="pb-label">Periodo contestabile</div>
+      <span style="font-weight:700;font-size:11px;">01/03/2025 – 31/05/2025</span>
+      <div style="margin-top:4px;font-size:8.5px;color:#666;">Entro 60 gg dalla scadenza per reclami</div>
+    </div>
+  </div>
+
+  <!-- ══ TABELLA CONSUMI ══ -->
+  <div class="section-title">Dettaglio consumi</div>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Fascia oraria</th>
+        <th>Consumi (kWh)</th>
+        <th>Prezzo unitario (€/kWh)</th>
+        <th>Importo (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>F1 – Ore di punta (lun-ven 8-19)</td>
+        <td>496 kWh</td>
+        <td>0,2847</td>
+        <td>141,21</td>
+      </tr>
+      <tr>
+        <td>F2 – Ore intermedie (lun-ven 7-8, 19-23; sab 7-23)</td>
+        <td>372 kWh</td>
+        <td>0,2591</td>
+        <td>96,38</td>
+      </tr>
+      <tr>
+        <td>F3 – Ore fuori punta (notti e domeniche)</td>
+        <td>372 kWh</td>
+        <td>0,2211</td>
+        <td>82,25</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"><strong>Totale energia consumata</strong></td>
+        <td>1.240 kWh · € 319,84</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- ══ TABELLA VOCI ══ -->
+  <div class="section-title">Composizione della bolletta</div>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>Voce</th>
+        <th>Descrizione</th>
+        <th>Importo (€)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Spesa per la materia energia</strong></td>
+        <td>Energia consumata (1.240 kWh) + perequazione</td>
+        <td>319,84</td>
+      </tr>
+      <tr>
+        <td><strong>Spesa per il trasporto</strong></td>
+        <td>Distribuzione rete, misura, dispacciamento</td>
+        <td>61,20</td>
+      </tr>
+      <tr>
+        <td><strong>Oneri di sistema</strong></td>
+        <td>A2, A3, UC3, UC6, MCT — costi di sistema nazionali</td>
+        <td>28,44</td>
+      </tr>
+      <tr>
+        <td><strong>Accise e imposte</strong></td>
+        <td>Accisa erariale (0,0227 €/kWh · 1.240 kWh)</td>
+        <td>28,15</td>
+      </tr>
+      <tr>
+        <td><strong>Conguaglio periodo precedente</strong></td>
+        <td>Conguaglio fattura N. 2025-01844 (gen-feb 2025)</td>
+        <td style="color:#c0392b;">+ 10,42</td>
+      </tr>
+      <tr>
+        <td><strong>IVA 10%</strong></td>
+        <td>Applicata su materia energia + trasporto + oneri</td>
+        <td>39,27</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2"><strong>TOTALE FATTURA</strong></td>
+        <td>€ 487,32</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- ══ CONFRONTO PERIODO PRECEDENTE ══ -->
+  <div class="nota">
+    <strong>Confronto con periodo precedente:</strong> La bolletta precedente (gen-feb 2025, 59 giorni) era di <strong>€ 142,10</strong>.
+    L'aumento è dovuto principalmente all'incremento dei consumi stagionali (+340 kWh rispetto al bimestre precedente)
+    e alla variazione della componente energia (Delibera ARERA 23/2025).
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <div class="footer">
+    <div>
+      <strong>LuceItalia S.p.A.</strong> — Sede legale: Via dell'Energia 1, 20121 Milano<br>
+      P.IVA 03456789012 · REA MI-1234567 · Cap. soc. € 50.000.000 i.v.<br>
+      Sportello clienti: 800 123 456 (lun-ven 8-20) · assistenza@luceitalia.it
+    </div>
+    <div style="text-align:right;">
+      Per reclami: Sportello clienti o reclamo scritto ex art. 66 TIQE<br>
+      Conciliazione: Sportello conciliazione ARERA (conciliazione.energia.it)<br>
+      Tutela: Autorità ARERA — www.arera.it
+    </div>
+  </div>
+
+  <div class="page-num">Pagina 1 di 1 &nbsp;·&nbsp; Fattura N. 2025-03847 &nbsp;·&nbsp; LuceItalia S.p.A.</div>
+
+</div>
+</body>
+</html>
