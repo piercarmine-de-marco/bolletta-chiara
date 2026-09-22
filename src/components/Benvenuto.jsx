@@ -5,9 +5,18 @@ export default function Benvenuto() {
   const { caricaBolletta, loading, errore } = useOrchestrator()
   const inputRef = useRef(null)
   const [drag, setDrag] = useState(false)
+  const [erroreFile, setErroreFile] = useState(null)
+  const [nomeFile, setNomeFile] = useState(null)
 
   function handleFile(file) {
-    if (!file || file.type !== 'application/pdf') return
+    if (!file) return
+    if (file.type !== 'application/pdf') {
+      setErroreFile('Questo file non è un PDF. Carica la tua bolletta in formato PDF (il file deve finire con .pdf).')
+      setNomeFile(null)
+      return
+    }
+    setErroreFile(null)
+    setNomeFile(file.name)
     caricaBolletta(file)
   }
 
@@ -23,15 +32,17 @@ export default function Benvenuto() {
 
   return (
     <div className="schermata">
-      <h1 className="schermata-titolo">BollettaChiara</h1>
+      <h1 className="schermata-titolo">Ciao! Sono BollettaChiara.</h1>
       <p className="schermata-sottotitolo">
-        Carica la tua bolletta e compilo il modulo di reclamo per te.
+        Carica la tua bolletta: leggo io tutto e compilo il modulo di reclamo per te.
       </p>
 
       {loading ? (
         <div className="messaggio-loading">
           <div className="spinner" />
-          Sto leggendo la tua bolletta, un momento…
+          {nomeFile
+            ? `Sto leggendo "${nomeFile}", un momento…`
+            : 'Sto leggendo la tua bolletta, un momento…'}
         </div>
       ) : (
         <div
@@ -59,6 +70,7 @@ export default function Benvenuto() {
         </div>
       )}
 
+      {erroreFile && <p className="messaggio-attenzione">{erroreFile}</p>}
       {errore && <p className="messaggio-errore">{errore}</p>}
     </div>
   )

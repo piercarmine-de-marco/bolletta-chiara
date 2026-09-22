@@ -68,7 +68,7 @@ async function testEstrattoAgent() {
   try { result = await estrattoAgent(null) } catch (e) { console.error('❌  Errore:', e.message); process.exit(1) }
   console.log('\n✅  JSON estratto:')
   console.log(JSON.stringify(result, null, 2))
-  const campiAttesi = ['codice_pod','codice_cliente','intestatario','indirizzo_fornitura','periodo_fatturazione','importo_totale','importo_periodo_precedente','consumi_kwh','scadenza_pagamento']
+  const campiAttesi = ['tipo_fornitura','email_fornitore','codice_pod','codice_cliente','intestatario','indirizzo_fornitura','periodo_fatturazione','importo_totale','importo_periodo_precedente','consumi_kwh','scadenza_pagamento']
   const mancanti = campiAttesi.filter(c => !(c in result))
   if (typeof result.importo_totale !== 'number') console.warn('⚠️   importo_totale non è number')
   if (mancanti.length) console.warn('⚠️   Campi mancanti:', mancanti.join(', '))

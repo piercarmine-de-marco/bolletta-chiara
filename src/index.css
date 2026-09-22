@@ -377,3 +377,99 @@ body {
   font-weight: 700;
   letter-spacing: 0.01em;
 }
+
+/* ── Step indicator ──────────────────────────────────────── */
+
+.step-wrapper {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.step-testo {
+  font-size: var(--f-base);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.step-testo strong {
+  color: var(--primary);
+  font-size: var(--f-lg);
+}
+
+.step-barra {
+  flex: 1;
+  max-width: 260px;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.step-barra-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.step-etichetta {
+  font-size: var(--f-base);
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Messaggio non-PDF ───────────────────────────────────── */
+
+.messaggio-attenzione {
+  font-size: var(--f-base);
+  color: #7d6608;
+  background: #fef9e7;
+  border: 1px solid #f9e79f;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+}
+
+/* ── Conferma invio ──────────────────────────────────────── */
+
+.conferma-box {
+  background: #eafaf1;
+  border: 2px solid var(--success);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.conferma-icona {
+  font-size: 56px;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.conferma-titolo {
+  font-size: var(--f-xl);
+  font-weight: 700;
+  color: var(--success);
+  margin-bottom: 0.5rem;
+}
+
+.conferma-testo {
+  font-size: var(--f-base);
+  color: var(--text);
+}
+
+/* ── Tool panel — stato completato ──────────────────────── */
+
+.tool-panel--ok {
+  border-color: var(--success);
+  background: #eafaf1;
+}
+
+.tool-panel-titolo--ok {
+  color: var(--success);
+}

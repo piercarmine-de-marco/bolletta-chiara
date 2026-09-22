@@ -1,24 +1,47 @@
 import { useState } from 'react'
 import { useBollettaContext } from '../context/BollettaContext.jsx'
 
+function apriEmail(testo, nomeCognome, emailFornitore) {
+  const oggetto = `Reclamo bolletta – ${nomeCognome ?? ''}`
+  const to = emailFornitore ?? ''
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent(oggetto)}&body=${encodeURIComponent(testo)}`
+}
+
 export default function BozzaReclamo() {
-  const { output } = useBollettaContext()
+  const { output, form, bolletta } = useBollettaContext()
   const [copiato, setCopiato] = useState(false)
 
   const testo = output.bozzaReclamo ?? ''
+  const nomeCognome = form.campi.nome_cognome ?? ''
+  const emailFornitore = bolletta.estratta?.email_fornitore ?? ''
 
   function copiaTesto() {
     navigator.clipboard.writeText(testo).then(() => {
       setCopiato(true)
-      setTimeout(() => setCopiato(false), 2500)
+      setTimeout(() => setCopiato(false), 3000)
     })
   }
 
   return (
     <div className="schermata">
-      <h1 className="schermata-titolo">Testo per l'email di reclamo</h1>
       <p className="schermata-sottotitolo">
-        Copia questo testo e incollalo nella tua email al fornitore.
+        L&apos;email di reclamo dovrebbe essersi aperta sul tuo dispositivo.
+      </p>
+
+      <div className="azioni" style={{ marginBottom: '2rem' }}>
+        <button
+          className="btn btn-primary btn-lg"
+          onClick={() => apriEmail(testo, nomeCognome, emailFornitore)}
+        >
+          Riapri nell&apos;email
+        </button>
+        <a className="btn btn-ghost btn-lg" href="/">
+          Ricomincia da capo
+        </a>
+      </div>
+
+      <p style={{ fontSize: 'var(--f-base)', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+        Se l&apos;email non si è aperta, copia il testo qui sotto e incollalo nella tua email:
       </p>
 
       <div className="card">
@@ -30,7 +53,7 @@ export default function BozzaReclamo() {
         />
 
         <div className="azioni" style={{ marginTop: '1rem' }}>
-          <button className="btn btn-primary btn-lg" onClick={copiaTesto}>
+          <button className="btn btn-secondary" onClick={copiaTesto}>
             {copiato ? '✔ Copiato!' : 'Copia il testo'}
           </button>
         </div>

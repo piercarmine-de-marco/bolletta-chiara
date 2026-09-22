@@ -6,6 +6,7 @@ export default function GuidaCampoManuale() {
   const dispatch = useBollettaDispatch()
   const { chiediSoccorso, loading } = useOrchestrator()
 
+  const opzioniPronti = form.campoManualeAttivo !== null
   const opzioni = form.opzioniCampoAttivo ?? []
   const selezionata = form.campi.motivo_reclamo
   const ultimoSuggerimento = sessione.ultimoBloco
@@ -14,16 +15,39 @@ export default function GuidaCampoManuale() {
     dispatch({ type: 'SET_CAMPO_MANUALE', payload: { campo: 'motivo_reclamo', valore: opzione } })
   }
 
+  const panelClass = `tool-panel${selezionata ? ' tool-panel--ok' : ''}`
+  const titoloClass = `tool-panel-titolo${selezionata ? ' tool-panel-titolo--ok' : ''}`
+
+  /* --- Stato 1: opzioni ancora in caricamento --- */
+  if (!opzioniPronti) {
+    return (
+      <div className="tool-panel">
+        <p className="tool-panel-titolo">✅ Ho compilato 5 campi per te.</p>
+        <div className="messaggio-loading">
+          <div className="spinner" />
+          Sto preparando i suggerimenti per il motivo…
+        </div>
+      </div>
+    )
+  }
+
+  /* --- Stato 2 & 3: opzioni pronte --- */
   return (
-    <div className="tool-panel">
-      <p className="tool-panel-titolo">
-        ✅ Ho compilato 5 campi per te.<br />
-        Manca solo il motivo del reclamo.
+    <div className={panelClass}>
+      <p className={titoloClass}>
+        {selezionata
+          ? '✅ Hai scelto il motivo!'
+          : '✅ Ho compilato 5 campi per te. Ora scegli il motivo:'}
       </p>
 
+      {selezionata && (
+        <p style={{ fontSize: 'var(--f-base)', color: 'var(--success)', marginBottom: '1rem' }}>
+          Puoi aggiungere note e poi premere &quot;Invia il reclamo&quot;.
+        </p>
+      )}
+
       {opzioni.length > 0 && (
-        <>
-          <p style={{ marginBottom: '0.75rem', fontSize: '18px' }}>Scegli il motivo:</p>
+        <div style={{ marginBottom: '1rem' }}>
           {opzioni.map((opzione, i) => (
             <button
               key={i}
@@ -34,10 +58,11 @@ export default function GuidaCampoManuale() {
               {selezionata === opzione ? '✔ ' : ''}{opzione}
             </button>
           ))}
-        </>
+        </div>
       )}
 
-      <div style={{ marginTop: '1rem' }}>
+      {/* Soccorso — visibile solo se l'utente è bloccato nonostante le opzioni */}
+      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
         {loading ? (
           <div className="messaggio-loading">
             <div className="spinner" />
@@ -45,7 +70,7 @@ export default function GuidaCampoManuale() {
           </div>
         ) : (
           <button className="btn btn-ghost btn-full" onClick={chiediSoccorso}>
-            Non so cosa fare
+            {opzioni.length > 0 ? 'Le opzioni non mi aiutano' : 'Non so cosa fare'}
           </button>
         )}
       </div>

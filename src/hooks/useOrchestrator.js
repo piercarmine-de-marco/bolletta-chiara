@@ -61,16 +61,16 @@ export function useOrchestrator() {
     await esegui('UTENTE_BLOCCATO')
   }
 
-  async function completaForm() {
-    await esegui('FORM_COMPLETATO')
-  }
-
-  async function generaReclamo() {
+  async function inviaReclamo() {
     setLoading(true)
     setErrore(null)
     try {
       const testo = await reclamoAgent(stato.form.campi, stato.bolletta.estratta)
       dispatch({ type: 'SET_RECLAMO', payload: testo })
+      dispatch({ type: 'SET_COMPLETATO' })
+      const oggetto = `Reclamo bolletta – ${stato.form.campi.nome_cognome ?? ''}`
+      const to = stato.bolletta.estratta?.email_fornitore ?? ''
+      window.location.href = `mailto:${to}?subject=${encodeURIComponent(oggetto)}&body=${encodeURIComponent(testo)}`
     } catch {
       setErrore('Qualcosa non ha funzionato. Riprova.')
     } finally {
@@ -82,8 +82,7 @@ export function useOrchestrator() {
     caricaBolletta,
     avviaReclamo,
     chiediSoccorso,
-    completaForm,
-    generaReclamo,
+    inviaReclamo,
     loading,
     errore,
   }

@@ -7,5 +7,6 @@
   "importo_totale": 487.32,
   "importo_periodo_precedente": 142.10,
   "consumi_kwh": 1240,
-  "scadenza_pagamento": "15/07/2025"
+  "scadenza_pagamento": "15/07/2025",
+  "email_fornitore": "reclami@luceitalia.it"
 }
